@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { QRCodeCanvas } from "qrcode.react";
 
-const socket = io("https://YOUR-RENDER-URL.onrender.com");
+const socket = io("https://tv-remote-project.onrender.com");
 
 function TV() {
 
@@ -20,10 +20,14 @@ function TV() {
     });
 
     socket.on("receive-link", (receivedLink) => {
+
+      console.log("LINK RECEIVED:", receivedLink);
+
       setLink(receivedLink);
 
-      // Open automatically
-      window.open(receivedLink, "_blank");
+      // Opens website on TV
+      window.location.href = receivedLink;
+
     });
 
     return () => {
@@ -53,6 +57,7 @@ function TV() {
       <h2>{command}</h2>
 
       <p>{link}</p>
+
     </div>
   );
 }

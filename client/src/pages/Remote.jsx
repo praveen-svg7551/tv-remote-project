@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 
-const socket = io("https://YOUR-RENDER-URL.onrender.com");
+const socket = io("https://tv-remote-project.onrender.com");
 
 function Remote() {
 
@@ -14,23 +14,14 @@ function Remote() {
     socket.emit("join-room", roomId);
   }, [roomId]);
 
-  const sendCommand = (command) => {
-
-    socket.emit("remote-command", {
-      roomId,
-      command,
-    });
-
-  };
-
   const sendLink = () => {
+
+    console.log("Sending:", link);
 
     socket.emit("send-link", {
       roomId,
       link,
     });
-
-    setLink("");
 
   };
 
@@ -42,22 +33,6 @@ function Remote() {
       }}
     >
       <h1>Phone Remote</h1>
-
-      <button
-        onClick={() => sendCommand("PLAY")}
-      >
-        PLAY
-      </button>
-
-      <br /><br />
-
-      <button
-        onClick={() => sendCommand("PAUSE")}
-      >
-        PAUSE
-      </button>
-
-      <br /><br />
 
       <input
         type="text"
