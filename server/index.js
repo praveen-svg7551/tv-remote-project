@@ -24,18 +24,52 @@ io.on("connection", (socket) => {
 
   console.log("Connected:", socket.id);
 
+  // Join room
   socket.on("join-room", (roomId) => {
+
     socket.join(roomId);
+
+    console.log("Joined Room:", roomId);
+
   });
 
-  // Remote Buttons
+  // Remote buttons
   socket.on("remote-command", ({ roomId, command }) => {
+
     io.to(roomId).emit("receive-command", command);
+
   });
 
-  // Send Link
+  // Send website link
   socket.on("send-link", ({ roomId, link }) => {
+
+    console.log("LINK:", link);
+
     io.to(roomId).emit("receive-link", link);
+
+  });
+
+  // Mouse movement
+  socket.on("mouse-move", ({ roomId, x, y }) => {
+
+    io.to(roomId).emit("mouse-update", {
+      x,
+      y,
+    });
+
+  });
+
+  // Mouse click
+  socket.on("mouse-click", ({ roomId }) => {
+
+    io.to(roomId).emit("mouse-clicked");
+
+  });
+
+  socket.on("disconnect", () => {
+
+    console.log("Disconnected:", socket.id);
+
   });
 
 });
@@ -43,5 +77,7 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, "0.0.0.0", () => {
+
   console.log(`Server running on ${PORT}`);
+
 });

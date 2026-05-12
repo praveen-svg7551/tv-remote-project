@@ -6,26 +6,45 @@ const socket = io("https://tv-remote-project.onrender.com");
 
 function TV() {
 
-  const [command, setCommand] = useState("");
-  const [link, setLink] = useState("");
-
   const roomId = "ROOM123";
+
+  const [mouse, setMouse] = useState({
+    x: 200,
+    y: 200,
+  });
+
+  const [clicked, setClicked] = useState(false);
 
   useEffect(() => {
 
     socket.emit("join-room", roomId);
 
-    socket.on("receive-command", (cmd) => {
-      setCommand(cmd);
+    // Mouse movement
+    socket.on("mouse-update", (data) => {
+
+      setMouse({
+        x: data.x,
+        y: data.y,
+      });
+
     });
 
-    socket.on("receive-link", (receivedLink) => {
+    // Mouse click animation
+    socket.on("mouse-clicked", () => {
 
-      console.log("LINK RECEIVED:", receivedLink);
+      setClicked(true);
+
+      setTimeout(() => {
+        setClicked(false);
+      }, 200);
+
+    });
+
+    // Receive link
+    socket.on("receive-link", (receivedLink) => {
 
       let finalLink = receivedLink.trim();
 
-      // Add https:// automatically
       if (
         !finalLink.startsWith("http://") &&
         !finalLink.startsWith("https://")
@@ -33,16 +52,16 @@ function TV() {
         finalLink = "https://" + finalLink;
       }
 
-      setLink(finalLink);
-
-      // Open external website
       window.open(finalLink, "_self");
 
     });
 
     return () => {
-      socket.off("receive-command");
+
+      socket.off("mouse-update");
+      socket.off("mouse-clicked");
       socket.off("receive-link");
+
     };
 
   }, []);
@@ -53,25 +72,57 @@ function TV() {
   return (
     <div
       style={{
-        textAlign: "center",
-        marginTop: "40px",
-        fontFamily: "Arial",
+        width: "100vw",
+        height: "100vh",
+        background: "black",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <h1>📺 Smart TV</h1>
 
-      <QRCodeCanvas
-        value={qrValue}
-        size={250}
+      {/* Mouse Cursor */}
+      <div
+        style={{
+          position: "absolute",
+          left: mouse.x,
+          top: mouse.y,
+          width: clicked ? "35px" : "20px",
+          height: clicked ? "35px" : "20px",
+          background: clicked ? "yellow" : "red",
+          borderRadius: "50%",
+          transition: "0.1s",
+        }}
       />
 
-      <h2>{command}</h2>
+      {/* QR Code */}
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          left: "20px",
+          background: "white",
+          padding: "10px",
+          borderRadius: "10px",
+        }}
+      >
+        <QRCodeCanvas
+          value={qrValue}
+          size={150}
+        />
+      </div>
 
-      <p>{link}</p>
+      <h1
+        style={{
+          color: "white",
+          textAlign: "center",
+          paddingTop: "40px",
+        }}
+      >
+        📺 Smart TV Remote
+      </h1>
 
     </div>
   );
 }
 
 export default TV;
-//
