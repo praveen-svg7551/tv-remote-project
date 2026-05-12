@@ -23,10 +23,20 @@ function TV() {
 
       console.log("LINK RECEIVED:", receivedLink);
 
-      setLink(receivedLink);
+      let finalLink = receivedLink.trim();
 
-      // Opens website on TV
-      window.location.href = receivedLink;
+      // Add https:// automatically
+      if (
+        !finalLink.startsWith("http://") &&
+        !finalLink.startsWith("https://")
+      ) {
+        finalLink = "https://" + finalLink;
+      }
+
+      setLink(finalLink);
+
+      // Open external website
+      window.open(finalLink, "_self");
 
     });
 
@@ -45,9 +55,10 @@ function TV() {
       style={{
         textAlign: "center",
         marginTop: "40px",
+        fontFamily: "Arial",
       }}
     >
-      <h1>Smart TV</h1>
+      <h1>📺 Smart TV</h1>
 
       <QRCodeCanvas
         value={qrValue}
@@ -63,3 +74,4 @@ function TV() {
 }
 
 export default TV;
+//
